@@ -1,0 +1,87 @@
+import React from 'react';
+import { Settings, Key, Cpu, ShieldCheck, UserCheck, Lock } from 'lucide-react';
+
+export default function SettingsView({ apiKey, setApiKey, aiModel, setAiModel }) {
+  return (
+    <div className="space-y-6 max-w-4xl">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h2 className="text-xl font-extrabold text-white flex items-center gap-2">
+            <Settings className="w-6 h-6 text-cyan-400" />
+            System Settings & User Profile Configuration
+          </h2>
+          <p className="text-xs text-slate-400 font-mono mt-1">
+            Configure AI Engine Model, API key credentials, and Role-Based Access Controls (RBAC).
+          </p>
+        </div>
+      </div>
+
+      {/* AI Model Selection */}
+      <div className="glass-panel p-6 rounded-2xl space-y-4">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2 font-mono">
+          <Cpu className="w-4 h-4 text-cyan-400" /> AI Engine Model Selection
+        </h3>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
+          {['Google Gemini 1.5 Pro', 'Google Gemini 1.5 Flash', 'Local Security Rule Engine (Offline)'].map((model) => (
+            <button
+              key={model}
+              onClick={() => setAiModel(model)}
+              className={`p-4 rounded-xl border text-left transition-all ${
+                aiModel === model
+                  ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 shadow-md'
+                  : 'bg-slate-950 text-slate-400 border-slate-900 hover:border-slate-800'
+              }`}
+            >
+              <div className="font-bold text-white mb-1">{model}</div>
+              <div className="text-[10px] text-slate-500">
+                {model.includes('Pro') ? 'Deep contextual reasoning' : model.includes('Flash') ? 'Ultra fast log parsing' : '100% Offline execution'}
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* API Key Credentials */}
+      <div className="glass-panel p-6 rounded-2xl space-y-4">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2 font-mono">
+          <Key className="w-4 h-4 text-cyan-400" /> API Keys & Secret Tokens
+        </h3>
+
+        <div className="space-y-2 font-mono text-xs">
+          <label className="text-slate-400">Gemini / OpenAI API Key:</label>
+          <input
+            type="password"
+            placeholder="AIzaSy... / sk-..."
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            className="bg-slate-950 border border-slate-800 text-cyan-300 rounded-xl px-4 py-2.5 w-full focus:outline-none focus:border-cyan-500"
+          />
+        </div>
+      </div>
+
+      {/* Role-Based Access Control (RBAC) */}
+      <div className="glass-panel p-6 rounded-2xl space-y-4">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2 font-mono">
+          <Lock className="w-4 h-4 text-cyan-400" /> Role-Based Access Control (RBAC)
+        </h3>
+
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 font-mono text-xs">
+          <div className="p-3 bg-cyan-500/10 border border-cyan-500/30 rounded-xl text-cyan-300 font-bold text-center">
+            Admin (Full Access)
+          </div>
+          <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl text-slate-400 text-center">
+            SOC Analyst
+          </div>
+          <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl text-slate-400 text-center">
+            Security Engineer
+          </div>
+          <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl text-slate-400 text-center">
+            Read Only
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
