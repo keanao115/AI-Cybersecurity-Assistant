@@ -16,7 +16,8 @@ import {
   Activity,
   Search,
   Radar,
-  Shield
+  Shield,
+  Server
 } from 'lucide-react';
 
 export default function Sidebar({ activeTab, setActiveTab }) {
@@ -37,6 +38,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     {
       label: 'LIVE MONITORING',
       items: [
+        { id: 'collectors', label: 'Collector Management', icon: Server, badge: 'PROD' },
         { id: 'live-network', label: 'Live Network Monitor', icon: Activity, badge: 'NEW' },
         { id: 'packet-inspector', label: 'Packet Inspector', icon: Search, badge: 'NEW' },
         { id: 'asset-discovery', label: 'Asset Discovery', icon: Radar, badge: 'NEW' },

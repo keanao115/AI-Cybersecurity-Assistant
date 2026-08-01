@@ -121,3 +121,38 @@ CREATE TABLE IF NOT EXISTS siem_events (
     raw_details JSONB DEFAULT '{}'::jsonb
 );
 
+CREATE TABLE IF NOT EXISTS unified_security_events (
+    id VARCHAR(100) PRIMARY KEY,
+    timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    collector VARCHAR(50) NOT NULL,
+    vendor VARCHAR(100) NOT NULL,
+    product VARCHAR(100) NOT NULL,
+    host VARCHAR(255) NOT NULL,
+    ip VARCHAR(45) NOT NULL,
+    severity VARCHAR(50) NOT NULL,
+    event_type VARCHAR(100) NOT NULL,
+    category VARCHAR(100) NOT NULL,
+    raw TEXT NOT NULL,
+    normalized JSONB DEFAULT '{}'::jsonb,
+    metadata JSONB DEFAULT '{}'::jsonb
+);
+
+CREATE INDEX IF NOT EXISTS idx_unified_events_collector ON unified_security_events(collector);
+CREATE INDEX IF NOT EXISTS idx_unified_events_severity ON unified_security_events(severity);
+CREATE INDEX IF NOT EXISTS idx_unified_events_vendor ON unified_security_events(vendor);
+CREATE INDEX IF NOT EXISTS idx_unified_events_timestamp ON unified_security_events(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_unified_events_host ON unified_security_events(host);
+
+CREATE TABLE IF NOT EXISTS collector_metrics (
+    id SERIAL PRIMARY KEY,
+    collector_name VARCHAR(100) NOT NULL,
+    collector_type VARCHAR(50) NOT NULL,
+    state VARCHAR(50) NOT NULL,
+    events_per_sec INT DEFAULT 0,
+    dropped_packets_total INT DEFAULT 0,
+    parser_errors_total INT DEFAULT 0,
+    average_latency_ms INT DEFAULT 0,
+    recorded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+

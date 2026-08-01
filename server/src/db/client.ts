@@ -56,7 +56,9 @@ export const memoryDb = {
   ],
   findings: [] as any[],
   logs: [] as any[],
-  reports: [] as any[]
+  reports: [] as any[],
+  unifiedEvents: [] as any[],
+  collectorMetrics: [] as any[],
 };
 
 let isPgConnected = false;

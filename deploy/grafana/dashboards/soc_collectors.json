@@ -1,0 +1,42 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "Live Collector Ingestion Rate (Events/Sec)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [{ "expr": "soc_collector_events_per_second", "legendFormat": "{{collector}}" }]
+    },
+    {
+      "title": "Collector Operational State (1=Running, 2=Degraded, 3=Failed)",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [{ "expr": "soc_collector_status", "legendFormat": "{{collector}}" }]
+    },
+    {
+      "title": "Dropped Packets by Reason",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [{ "expr": "soc_collector_dropped_packets_total", "legendFormat": "{{collector}} - {{reason}}" }]
+    },
+    {
+      "title": "Queue Depth & Watermarks",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [{ "expr": "soc_collector_queue_depth", "legendFormat": "{{collector}}" }]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["soc", "collectors", "telemetry"],
+  "time": { "from": "now-15m", "to": "now" },
+  "title": "Enterprise SOC Collectors Dashboard",
+  "uid": "soc-collectors-dashboard"
+}

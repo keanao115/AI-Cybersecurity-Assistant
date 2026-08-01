@@ -22,6 +22,15 @@ import { startSyslogReceiver, getSyslogStats } from './services/syslogReceiverSe
 import { loadThreatIntelFeeds, getThreatIntelStats, getActiveIocList } from './services/threatIntelService.js';
 import { getSystemHealth } from './services/systemHealthService.js';
 
+// Live Telemetry Collectors & Queue Layer
+import { InMemoryMessageQueue } from './queue/inMemoryQueue.js';
+import { TelemetryPipelineService } from './services/telemetryPipelineService.js';
+import { SyslogCollectorService } from './collectors/syslogCollectorService.js';
+import { WefCollectorService } from './collectors/wefCollectorService.js';
+import { NetflowCollectorService } from './collectors/netflowCollectorService.js';
+import { createCollectorRouter } from './routes/collectorRoutes.js';
+import { generatePrometheusMetrics } from './metrics/prometheusExporter.js';
+
 dotenv.config();
 
 const app = express();
@@ -35,6 +44,68 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // ─── Global Rate Limiting ────────────────────────────────────────────────────
 app.use('/api/', apiRateLimiter);
+
+// ─── Telemetry Queue & Collector Pipeline Initialization ────────────────────
+const messageQueue = new InMemoryMessageQueue(10000);
+const pipelineService = new TelemetryPipelineService(messageQueue);
+pipelineService.initializePipeline();
+
+const syslogCollector = new SyslogCollectorService(
+  {
+    name: 'Syslog-Server',
+    type: 'syslog',
+    enabled: true,
+    udpPort: 514,
+    tcpPort: 514,
+    maxPacketSizeBytes: 65536,
+    rateLimitEventsPerSec: 500,
+    rateLimitBurst: 2000,
+    enableTls: false,
+    enablePiiMasking: true,
+    enabledVendorParsers: ['Linux', 'Cisco', 'PaloAlto', 'Fortinet'],
+  },
+  messageQueue
+);
+
+const wefCollector = new WefCollectorService(
+  {
+    name: 'Windows-Event-Collector',
+    type: 'wef',
+    enabled: true,
+    httpPort: 5516,
+    maxPacketSizeBytes: 2097152, // 2MB
+    rateLimitEventsPerSec: 300,
+    rateLimitBurst: 1000,
+    enableTls: false,
+    enablePiiMasking: true,
+    enabledVendorParsers: ['Microsoft-Windows-Security-Auditing', 'Sysmon', 'PowerShell'],
+  },
+  messageQueue
+);
+
+const netflowCollector = new NetflowCollectorService(
+  {
+    name: 'NetFlow-IPFIX-Collector',
+    type: 'netflow',
+    enabled: true,
+    udpPort: 2055,
+    maxPacketSizeBytes: 65536,
+    rateLimitEventsPerSec: 1000,
+    rateLimitBurst: 5000,
+    enableTls: false,
+    enablePiiMasking: false,
+    enabledVendorParsers: ['NetFlow-v5', 'NetFlow-v9', 'IPFIX'],
+  },
+  messageQueue
+);
+
+const collectors = [syslogCollector, wefCollector, netflowCollector];
+
+// ─── Prometheus OpenMetrics Endpoint ───────────────────────────────────────
+app.get('/metrics', (_req, res) => {
+  res.setHeader('Content-Type', 'text/plain; version=0.0.4');
+  res.send(generatePrometheusMetrics(collectors));
+});
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get('/health', async (req, res) => {
@@ -52,7 +123,9 @@ app.get('/health', async (req, res) => {
       'Auth', 'Assets', 'Ingest', 'Vulnerabilities', 'Reports', 'Threats',
       'NetworkFlow', 'Packets', 'Discovery', 'SIEM', 'WebSocket',
       'GeminiAI', 'SyslogReceiver', 'ThreatIntel', 'GeoIP', 'NVD_CVE',
+      'SyslogCollector', 'WefCollector', 'NetflowCollector', 'PrometheusMetrics'
     ],
+    collectorHealth: collectors.map(c => c.getHealth()),
     realFeatures: {
       geminiAI: geminiEnabled ? 'ACTIVE' : 'FALLBACK (add GEMINI_API_KEY)',
       syslogReceiver: syslogStats,
@@ -75,6 +148,9 @@ app.use('/api/vulnerabilities', authenticateJwt, vulnerabilityRouter);
 app.use('/api/reports', authenticateJwt, reportRouter);
 app.use('/api/threats', authenticateJwt, threatRouter);
 app.use('/api/scan', threatRouter); // Compatibility mapping
+
+// ─── REST Routes — Collector Management & Live Telemetry ─────────────────────
+app.use('/api/collectors', authenticateJwt, createCollectorRouter(collectors));
 
 // ─── REST Routes — Phase 2: Network Monitoring, PCAP, Discovery, SIEM ───────
 app.use('/api/network-flows', authenticateJwt, networkFlowRouter);
@@ -109,12 +185,19 @@ httpServer.listen(PORT, async () => {
   console.log(`=======================================================`);
   console.log(`[Intelligent Enterprise Security Operations Platform v3.0] Running on http://localhost:${PORT}`);
   console.log(`[WebSocket] Live Telemetry Stream: ws://localhost:${PORT}/ws/telemetry`);
+  console.log(`[Prometheus] OpenMetrics Endpoint: http://localhost:${PORT}/metrics`);
   console.log(`=======================================================`);
 
   await initDbConnection();
 
-  // Start real services
-  startSyslogReceiver();
+  // Start Enterprise Telemetry Collectors (Syslog RFC 3164/5424, WEF XML, NetFlow v5/v9/IPFIX)
+
+  // Start Enterprise Collectors (Syslog, WEF, NetFlow)
+  for (const c of collectors) {
+    c.start().catch((err) => {
+      console.warn(`[Collector Boot Warning] ${c.name} start delayed:`, err.message);
+    });
+  }
 
   // Load threat intel feeds asynchronously (non-blocking)
   loadThreatIntelFeeds().catch(err => {

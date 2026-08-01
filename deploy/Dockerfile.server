@@ -1,0 +1,30 @@
+# Production Multi-Stage Dockerfile for SOC Platform Backend
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY server/package*.json ./server/
+
+WORKDIR /app/server
+RUN npm ci
+
+COPY server/ ./
+RUN npm run build || npx tsc --noEmit
+
+FROM node:20-alpine AS runner
+
+WORKDIR /app/server
+
+ENV NODE_ENV=production
+ENV PORT=5000
+
+COPY server/package*.json ./
+RUN npm ci --only=production
+
+COPY --from=builder /app/server/dist ./dist
+COPY --from=builder /app/server/src/db/schema.sql ./dist/db/schema.sql
+
+EXPOSE 5000 5514/udp 5515/tcp 5516/tcp 2055/udp
+
+CMD ["node", "dist/index.js"]

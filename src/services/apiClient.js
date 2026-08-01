@@ -1,6 +1,52 @@
-// CyberMind SOC Platform - Frontend API Client v3.0 (Real Implementations)
+// ─── Collector Management APIs ─────────────────────────────────────────────
 
-const API_BASE = '/api';
+export async function fetchCollectorStatus() {
+  try {
+    const res = await fetch(`${API_BASE}/collectors/status`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[API Client] fetchCollectorStatus fallback:', err.message);
+    return null;
+  }
+}
+
+export async function fetchCollectorMetrics() {
+  try {
+    const res = await fetch(`${API_BASE}/collectors/metrics`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[API Client] fetchCollectorMetrics fallback:', err.message);
+    return null;
+  }
+}
+
+export async function fetchCollectorEvents(params = {}) {
+  try {
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`${API_BASE}/collectors/events?${query}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[API Client] fetchCollectorEvents fallback:', err.message);
+    return null;
+  }
+}
+
+export async function controlCollectorState(collectorName, action) {
+  try {
+    const res = await fetch(`${API_BASE}/collectors/${collectorName}/${action}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn(`[API Client] controlCollectorState ${action} failed:`, err.message);
+    return null;
+  }
+}
 
 // ─── Core SOC APIs ───────────────────────────────────────────────────────────
 
