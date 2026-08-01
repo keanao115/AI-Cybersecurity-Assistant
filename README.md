@@ -1,10 +1,10 @@
-# CyberMind AI - Autonomous Enterprise AI Cybersecurity SOC Platform
+# Intelligent Enterprise Security Operations Platform
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Stack: React + Vite](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-06b6d4)](https://vitejs.dev/)
 [![Design: Apple + Microsoft Dark Glassmorphism](https://img.shields.io/badge/Design-Dark%20SOC%20Glassmorphism-10b981)]()
 
-**CyberMind AI** is an enterprise-grade AI Cybersecurity Operations Center (SOC) platform designed for real-time log ingestion, threat detection, attack path explanation, MITRE ATT&CK mapping, interactive attack simulation, and automated remediation script generation (PowerShell, Bash, YARA, Sigma, Snort, Suricata).
+**Intelligent Enterprise Security Operations Platform** is an enterprise-grade AI Cybersecurity Operations Center (SOC) platform designed for real-time log ingestion, threat detection, attack path explanation, MITRE ATT&CK mapping, interactive attack simulation, and automated remediation script generation (PowerShell, Bash, YARA, Sigma, Snort, Suricata).
 
 ---
 

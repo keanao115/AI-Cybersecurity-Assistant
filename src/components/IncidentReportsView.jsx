@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FileSpreadsheet, Download, Printer, ShieldCheck, FileText, Check } from 'lucide-react';
 import jsPDF from 'jspdf';
+import { generatePdfReport } from '../services/apiClient';
 
 export default function IncidentReportsView({ anomalies }) {
   const [downloadedFormat, setDownloadedFormat] = useState(null);
@@ -33,17 +34,32 @@ This report details the technical security findings and defensive telemetry eval
 4. Schedule periodic red-team exercises via the Attack Simulation module.
 `;
 
-  const handleDownloadPdf = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text("CYBERMIND AI - SECURITY AUDIT REPORT", 14, 20);
-    doc.setFontSize(10);
-    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28);
-    doc.text("Classification: CONFIDENTIAL / CISO AUDIT", 14, 34);
+  const handleDownloadPdf = async () => {
+    const apiBlob = await generatePdfReport({
+      title: "CYBERMIND SOC PLATFORM - SECURITY AUDIT REPORT",
+      classification: "CONFIDENTIAL / CISO AUDIT",
+      riskScore: 92,
+      summary: reportMarkdown
+    });
 
-    const splitText = doc.splitTextToSize(reportMarkdown, 180);
-    doc.text(splitText, 14, 45);
-    doc.save("CyberMind_Security_Audit_Report.pdf");
+    if (apiBlob) {
+      const url = URL.createObjectURL(apiBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'CyberMind_SOC_Security_Audit_Report.pdf';
+      a.click();
+    } else {
+      const doc = new jsPDF();
+      doc.setFontSize(16);
+      doc.text("CYBERMIND AI - SECURITY AUDIT REPORT", 14, 20);
+      doc.setFontSize(10);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28);
+      doc.text("Classification: CONFIDENTIAL / CISO AUDIT", 14, 34);
+
+      const splitText = doc.splitTextToSize(reportMarkdown, 180);
+      doc.text(splitText, 14, 45);
+      doc.save("CyberMind_Security_Audit_Report.pdf");
+    }
 
     setDownloadedFormat('PDF');
     setTimeout(() => setDownloadedFormat(null), 3000);

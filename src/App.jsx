@@ -15,6 +15,11 @@ import RagKnowledgeView from './components/RagKnowledgeView';
 import AiChatView from './components/AiChatView';
 import SettingsView from './components/SettingsView';
 import ApiKeyModal from './components/ApiKeyModal';
+// SOC Platform Expansion — Phase 2 Monitoring Modules
+import LiveNetworkDashboard from './components/LiveNetworkDashboard';
+import PacketInspectorView from './components/PacketInspectorView';
+import AssetDiscoveryView from './components/AssetDiscoveryView';
+import SiemEventConsole from './components/SiemEventConsole';
 
 import { SAMPLE_WINDOWS_LOGS, SAMPLE_LINUX_LOGS, SAMPLE_FIREWALL_LOGS, SAMPLE_NMAP_XML } from './data/sampleData';
 import { parseWindowsEventLog, parseLinuxLog, parseFirewallLog, parseNmapScan } from './utils/logParsers';
@@ -71,6 +76,11 @@ export default function App() {
           {activeTab === 'settings' && (
             <SettingsView apiKey={apiKey} setApiKey={setApiKey} aiModel={aiModel} setAiModel={setAiModel} />
           )}
+          {/* SOC Platform Expansion — Phase 2 */}
+          {activeTab === 'live-network' && <LiveNetworkDashboard />}
+          {activeTab === 'packet-inspector' && <PacketInspectorView />}
+          {activeTab === 'asset-discovery' && <AssetDiscoveryView />}
+          {activeTab === 'siem-console' && <SiemEventConsole />}
         </main>
       </div>
 

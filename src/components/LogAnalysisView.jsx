@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FileText, Upload, RefreshCw, CheckCircle, Search, ShieldAlert, Sparkles, Filter } from 'lucide-react';
 import { SAMPLE_WINDOWS_LOGS, SAMPLE_LINUX_LOGS, SAMPLE_FIREWALL_LOGS } from '../data/sampleData';
 import { parseWindowsEventLog, parseLinuxLog, parseFirewallLog } from '../utils/logParsers';
+import { ingestLogs } from '../services/apiClient';
 
 export default function LogAnalysisView({ onLogAnalyzed }) {
   const [logText, setLogText] = useState(SAMPLE_WINDOWS_LOGS);
@@ -26,8 +27,26 @@ export default function LogAnalysisView({ onLogAnalyzed }) {
     reader.readAsText(file);
   };
 
-  const handleRunAnalysis = () => {
+  const handleRunAnalysis = async () => {
     setIsAnalyzing(true);
+    
+    // Call Express REST API for backend normalization & storage
+    try {
+      const apiResult = await ingestLogs(logText, logType);
+      if (apiResult && apiResult.parsed) {
+        onLogAnalyzed({
+          windowsLogs: apiResult.parsed.windowsLogs || [],
+          linuxLogs: apiResult.parsed.linuxLogs || [],
+          firewallLogs: apiResult.parsed.suricataAlerts || []
+        });
+        setIsAnalyzing(false);
+        return;
+      }
+    } catch (e) {
+      console.warn("Backend API unavailable, executing client parser fallback:", e);
+    }
+
+    // Client-side parser fallback
     setTimeout(() => {
       let win = [];
       let lnx = [];
@@ -39,7 +58,7 @@ export default function LogAnalysisView({ onLogAnalyzed }) {
 
       onLogAnalyzed({ windowsLogs: win, linuxLogs: lnx, firewallLogs: fw });
       setIsAnalyzing(false);
-    }, 600);
+    }, 400);
   };
 
   const filteredLines = logText.split('\n').filter(l => l.toLowerCase().includes(filterQuery.toLowerCase()));

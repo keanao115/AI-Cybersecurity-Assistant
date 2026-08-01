@@ -39,7 +39,6 @@ export default defineConfig({
             { port: 8443, name: 'HTTPS-Alt', service: 'Alternative Secure Web Server' }
           ];
 
-          // Perform parallel TCP socket probes using Node.js native net.Socket
           const probePort = (targetHost, portObj) => {
             return new Promise((resolve) => {
               const start = Date.now();
@@ -113,6 +112,19 @@ export default defineConfig({
   ],
   server: {
     port: 3000,
-    open: true
+    open: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false
+      },
+      '/ws': {
+        target: 'ws://localhost:5000',
+        ws: true,
+        changeOrigin: true,
+        secure: false
+      }
+    }
   }
 })

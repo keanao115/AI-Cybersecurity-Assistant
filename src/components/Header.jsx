@@ -12,14 +12,14 @@ export default function Header({ apiKey, setApiKey, setShowApiModal }) {
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="font-extrabold text-lg tracking-wider bg-gradient-to-r from-white via-slate-200 to-cyan-400 bg-clip-text text-transparent">
-              CyberMind AI
+            <h1 className="font-extrabold text-base tracking-wider bg-gradient-to-r from-white via-slate-200 to-cyan-400 bg-clip-text text-transparent">
+              Intelligent Enterprise Security Operations Platform
             </h1>
             <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-              ENTERPRISE v2.5
+              ENTERPRISE v3.0
             </span>
           </div>
-          <p className="text-xs text-slate-400 font-mono">Autonomous Cyber Threat Intelligence & SOC Copilot</p>
+          <p className="text-xs text-slate-400 font-mono">Autonomous AI Threat Detection & Real-Time SOC Monitoring</p>
         </div>
       </div>
 
