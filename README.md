@@ -83,7 +83,7 @@
 
 1. Clone or open the repository:
 ```bash
-cd "e:\IT\AI Cybersecurity Assistant"
+cd "e:\IT\Intelligent Enterprise Security Operations Platform"
 ```
 
 2. Install dependencies:
