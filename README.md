@@ -77,7 +77,8 @@
 ## ⚡ Quick Start & Running Locally
 
 ### Prerequisites
-- Node.js (v18+) & npm
+- **Node.js** v18+ & npm
+- **PostgreSQL** 16+ running on `localhost:5432` with database `soc_db`
 
 ### Installation Steps
 
@@ -86,14 +87,75 @@
 cd "e:\IT\Intelligent Enterprise Security Operations Platform"
 ```
 
-2. Install dependencies:
+2. Install frontend dependencies:
 ```bash
 npm install
 ```
 
-3. Run the local development server:
+3. Install backend dependencies:
 ```bash
-npm run dev
+cd server && npm install
+```
+
+---
+
+### 🖥️ Running the Backend (SOC Collector Engine)
+
+Start the backend development server from the `server/` directory:
+
+```powershell
+PS E:\IT\Intelligent Enterprise Security Operations Platform\server> npm run dev
+```
+
+Expected output on successful startup:
+
+```
+[Telemetry Pipeline] Subscribing to queue channels (syslog, wef, netflow)...
+=======================================================
+[Intelligent Enterprise Security Operations Platform v3.0] Running on http://localhost:5000
+[WebSocket] Live Telemetry Stream: ws://localhost:5000/ws/telemetry
+[Prometheus] OpenMetrics Endpoint: http://localhost:5000/metrics
+=======================================================
+[DB] PostgreSQL connected successfully to soc_db on localhost:5432.
+[DB] PostgreSQL schema verified and ready for live operations.
+[Collector Lifecycle] Syslog-Server (syslog): Stopped ➔ Initializing
+[Collector Lifecycle] Windows-Event-Collector (wef): Stopped ➔ Initializing
+[Collector Lifecycle] NetFlow-IPFIX-Collector (netflow): Stopped ➔ Initializing
+[Syslog UDP] Listening on port 5514
+[Syslog TCP] Listening on port 5515
+[WEF HTTP] Listening for Windows Event Forwarding XML on port 5516
+[NetFlow UDP] Listening for NetFlow v5/v9/IPFIX on port 2055
+[Collector Lifecycle] Syslog-Server (syslog): Initializing ➔ Running
+[Collector Lifecycle] Windows-Event-Collector (wef): Initializing ➔ Running
+[Collector Lifecycle] NetFlow-IPFIX-Collector (netflow): Initializing ➔ Running
+```
+
+#### Backend Service Endpoints
+
+| Service | URL / Address | Protocol |
+|---|---|---|
+| REST API | `http://localhost:5000/api` | HTTP |
+| WebSocket Telemetry Stream | `ws://localhost:5000/ws/telemetry` | WebSocket |
+| Prometheus Metrics | `http://localhost:5000/metrics` | HTTP |
+| Health Check | `http://localhost:5000/health` | HTTP |
+| Collector Management | `http://localhost:5000/api/collectors/status` | HTTP |
+
+#### Live Telemetry Collector Ports
+
+| Collector | Port | Protocol |
+|---|---|---|
+| Syslog (RFC 3164 / 5424) | `5514` UDP / `5515` TCP | UDP & TCP |
+| Windows Event Forwarding (WEF) | `5516` | HTTP (WinRM XML) |
+| NetFlow v5 / v9 / IPFIX | `2055` | UDP Binary |
+
+---
+
+### 🌐 Running the Frontend (React Dashboard)
+
+In a **separate terminal**, start the Vite development server from the project root:
+
+```powershell
+PS E:\IT\Intelligent Enterprise Security Operations Platform> npm run dev
 ```
 
 4. Open your browser and navigate to:
