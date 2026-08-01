@@ -36,13 +36,17 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       ]
     },
     {
-      label: 'LIVE MONITORING',
+      label: 'LIVE MONITORING & TELEMETRY',
       items: [
         { id: 'collectors', label: 'Collector Management', icon: Server, badge: 'PROD' },
-        { id: 'live-network', label: 'Live Network Monitor', icon: Activity, badge: 'NEW' },
-        { id: 'packet-inspector', label: 'Packet Inspector', icon: Search, badge: 'NEW' },
-        { id: 'asset-discovery', label: 'Asset Discovery', icon: Radar, badge: 'NEW' },
-        { id: 'siem-console', label: 'SIEM Event Console', icon: Shield, badge: 'NEW' },
+        { id: 'packet-capture', label: 'Live Packet Capture', icon: Activity, badge: 'NPCAP' },
+        { id: 'zeek-suricata', label: 'Zeek & Suricata IDS', icon: Shield, badge: 'EVE' },
+        { id: 'pipeline-performance', label: 'Pipeline Performance', icon: Zap, badge: 'METRICS' },
+        { id: 'investigation-timeline', label: 'Evidence Timeline', icon: Radar, badge: 'AI' },
+        { id: 'live-network', label: 'Live Network Monitor', icon: Activity },
+        { id: 'packet-inspector', label: 'Packet Inspector', icon: Search },
+        { id: 'asset-discovery', label: 'Asset Discovery', icon: Radar },
+        { id: 'siem-console', label: 'SIEM Event Console', icon: Shield },
       ]
     },
     {

@@ -2,6 +2,7 @@ import dgram from 'dgram';
 import { BaseCollector } from './baseCollector.js';
 import { decodeNetflowBuffer } from '../parsers/netflow/netflowDecoder.js';
 import { crypto } from '../utils/cryptoShim.js';
+import { createLiveCollectorProvenance } from '../provenance/provenanceFactory.js';
 export class NetflowCollectorService extends BaseCollector {
     udpSocket = null;
     boundPort = 0;
@@ -77,6 +78,7 @@ export class NetflowCollectorService extends BaseCollector {
                 durationMs: record.durationMs,
                 tags: ['netflow', `v${record.version}`, record.protocol.toLowerCase()],
             },
+            provenance: createLiveCollectorProvenance('netflow', `netflow-udp-${destPort}`),
         };
     }
     getListeningPorts() {

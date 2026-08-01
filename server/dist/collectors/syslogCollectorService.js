@@ -4,6 +4,7 @@ import { BaseCollector } from './baseCollector.js';
 import { parseSyslogHeader } from '../parsers/syslog/syslogRfcParser.js';
 import { SyslogVendorRegistry } from '../parsers/syslog/syslogVendorRegistry.js';
 import { crypto } from '../utils/cryptoShim.js';
+import { createLiveCollectorProvenance } from '../provenance/provenanceFactory.js';
 export class SyslogCollectorService extends BaseCollector {
     udpSocket = null;
     tcpServer = null;
@@ -87,6 +88,7 @@ export class SyslogCollectorService extends BaseCollector {
                 facility: header.facility,
                 tags: ['syslog', ...vendorResult.tags],
             },
+            provenance: createLiveCollectorProvenance('syslog', `syslog-${protocol.toLowerCase()}-${destPort}`, header.timestamp),
         };
         return unified;
     }

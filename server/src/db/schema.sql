@@ -134,7 +134,17 @@ CREATE TABLE IF NOT EXISTS unified_security_events (
     category VARCHAR(100) NOT NULL,
     raw TEXT NOT NULL,
     normalized JSONB DEFAULT '{}'::jsonb,
-    metadata JSONB DEFAULT '{}'::jsonb
+    metadata JSONB DEFAULT '{}'::jsonb,
+    platform_mode VARCHAR(10) NOT NULL DEFAULT 'LIVE',
+    telemetry_source VARCHAR(50) NOT NULL DEFAULT 'UNKNOWN',
+    collection_method VARCHAR(30) NOT NULL DEFAULT 'MANUAL',
+    is_synthetic BOOLEAN NOT NULL DEFAULT FALSE,
+    is_seeded BOOLEAN NOT NULL DEFAULT FALSE,
+    is_replay BOOLEAN NOT NULL DEFAULT FALSE,
+    collector_id VARCHAR(255),
+    sensor_id VARCHAR(255),
+    ingestion_timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    event_timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_unified_events_collector ON unified_security_events(collector);
@@ -142,6 +152,7 @@ CREATE INDEX IF NOT EXISTS idx_unified_events_severity ON unified_security_event
 CREATE INDEX IF NOT EXISTS idx_unified_events_vendor ON unified_security_events(vendor);
 CREATE INDEX IF NOT EXISTS idx_unified_events_timestamp ON unified_security_events(timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_unified_events_host ON unified_security_events(host);
+CREATE INDEX IF NOT EXISTS idx_unified_events_provenance ON unified_security_events(platform_mode, telemetry_source, is_synthetic);
 
 CREATE TABLE IF NOT EXISTS collector_metrics (
     id SERIAL PRIMARY KEY,
@@ -154,5 +165,54 @@ CREATE TABLE IF NOT EXISTS collector_metrics (
     average_latency_ms INT DEFAULT 0,
     recorded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id SERIAL PRIMARY KEY,
+    timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    user_id VARCHAR(100) DEFAULT 'system',
+    action VARCHAR(100) NOT NULL,
+    previous_value TEXT,
+    new_value TEXT,
+    source_ip VARCHAR(45) DEFAULT '127.0.0.1',
+    result VARCHAR(50) DEFAULT 'SUCCESS'
+);
+
+CREATE TABLE IF NOT EXISTS capture_sessions (
+    session_id VARCHAR(100) PRIMARY KEY,
+    interface_name VARCHAR(100) NOT NULL,
+    bpf_filter TEXT DEFAULT 'ip',
+    promiscuous_mode BOOLEAN DEFAULT TRUE,
+    status VARCHAR(50) NOT NULL,
+    started_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    stopped_at TIMESTAMP WITH TIME ZONE,
+    packets_captured BIGINT DEFAULT 0,
+    bytes_captured BIGINT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS zeek_events (
+    id VARCHAR(100) PRIMARY KEY,
+    timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    log_type VARCHAR(50) NOT NULL,
+    uid VARCHAR(100),
+    source_ip VARCHAR(45),
+    source_port INT,
+    destination_ip VARCHAR(45),
+    destination_port INT,
+    raw_payload JSONB DEFAULT '{}'::jsonb
+);
+
+CREATE TABLE IF NOT EXISTS suricata_events (
+    id VARCHAR(100) PRIMARY KEY,
+    timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    event_type VARCHAR(50) NOT NULL,
+    signature TEXT,
+    signature_id INT,
+    severity VARCHAR(20),
+    source_ip VARCHAR(45),
+    destination_ip VARCHAR(45),
+    raw_payload JSONB DEFAULT '{}'::jsonb
+);
+
+
 
 

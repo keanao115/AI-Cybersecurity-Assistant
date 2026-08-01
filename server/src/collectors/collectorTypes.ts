@@ -39,6 +39,7 @@ export interface UnifiedSecurityEvent {
     durationMs?: number;
     tags: string[];
   };
+  provenance?: import('../types/telemetryProvenance.js').TelemetryProvenance;
 }
 
 export interface CollectorHealth {

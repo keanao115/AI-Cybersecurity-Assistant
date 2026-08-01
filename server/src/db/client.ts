@@ -28,37 +28,16 @@ export const memoryDb = {
       created_at: new Date().toISOString(),
     }
   ],
-  assets: [
-    {
-      id: 1,
-      hostname: 'DC-SRV-01.corp.internal',
-      ip_address: '192.168.1.10',
-      mac_address: '00:15:5D:01:2A:8C',
-      os_name: 'Windows Server 2022 Datacenter',
-      status: 'Active',
-      installed_software: [{ name: 'Apache httpd', version: '2.4.49' }, { name: 'OpenSSH', version: '8.2p1' }],
-      running_services: [{ port: 80, service: 'http' }, { port: 445, service: 'microsoft-ds' }],
-      owner: 'Domain Controller Admin',
-      tags: ['Critical', 'DC', 'Internal']
-    },
-    {
-      id: 2,
-      hostname: 'web-prod-01.corp.internal',
-      ip_address: '192.168.1.50',
-      mac_address: '00:15:5D:04:3B:11',
-      os_name: 'Ubuntu 22.04 LTS (Linux kernel 5.15)',
-      status: 'Active',
-      installed_software: [{ name: 'Log4j', version: '2.14.1' }, { name: 'nginx', version: '1.18.0' }],
-      running_services: [{ port: 443, service: 'https' }, { port: 8080, service: 'http-proxy' }],
-      owner: 'DevOps / Cloud Team',
-      tags: ['Web', 'DMZ', 'Production']
-    }
-  ],
+  assets: [] as any[],
   findings: [] as any[],
   logs: [] as any[],
   reports: [] as any[],
   unifiedEvents: [] as any[],
   collectorMetrics: [] as any[],
+  auditLogs: [] as any[],
+  zeekEvents: [] as any[],
+  suricataEvents: [] as any[],
+  captureSessions: [] as any[],
 };
 
 let isPgConnected = false;

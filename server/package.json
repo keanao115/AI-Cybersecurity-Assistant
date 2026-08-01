@@ -1,13 +1,13 @@
 {
-  "name": "intelligent-enterprise-soc-backend",
+  "name": "security-engineering-portfolio-project-backend",
   "version": "1.0.0",
   "private": true,
-  "description": "Enterprise Security Operations Platform (SOC Platform) Backend",
+  "description": "Security Engineering Portfolio Project Backend",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "test": "tsc && node --test dist/tests/collectors.test.js",
+    "test": "tsc && node --test dist/tests/*.test.js",
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts"
   },

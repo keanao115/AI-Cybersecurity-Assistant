@@ -1,10 +1,10 @@
-# Intelligent Enterprise Security Operations Platform
+# Security Engineering Portfolio Project
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Stack: React + Vite](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-06b6d4)](https://vitejs.dev/)
 [![Design: Apple + Microsoft Dark Glassmorphism](https://img.shields.io/badge/Design-Dark%20SOC%20Glassmorphism-10b981)]()
 
-**Intelligent Enterprise Security Operations Platform** is an enterprise-grade AI Cybersecurity Operations Center (SOC) platform designed for real-time log ingestion, threat detection, attack path explanation, MITRE ATT&CK mapping, interactive attack simulation, and automated remediation script generation (PowerShell, Bash, YARA, Sigma, Snort, Suricata).
+**Security Engineering Portfolio Project** is an enterprise-grade AI Cybersecurity Operations Center (SOC) platform designed for real-time log ingestion, threat detection, attack path explanation, MITRE ATT&CK mapping, interactive attack simulation, and automated remediation script generation (PowerShell, Bash, YARA, Sigma, Snort, Suricata).
 
 ---
 
@@ -38,7 +38,26 @@
   - **Linux Bash**: IPTables drops, stage-2 shell kill, SSH hardening.
   - **YARA Rules**: Malware stager detection strings.
   - **Sigma Rules**: Windows process creation detection rules.
-  - **Snort & Suricata Rules**: IDS/IPS packet inspection signatures.
+### 7. 🛡️ Data Authenticity & Telemetry Provenance Architecture
+- **Strict Operating Mode Isolation**: Supports `LIVE` mode (default) and `DEMO` mode.
+- **Zero Fake Data in LIVE Mode**: Background synthetic flow generators are **disabled by default**. Empty live environments display honest empty states.
+- **Immutable Provenance Metadata**: Every single event, flow, alert, and packet capture carries immutable provenance fields (`platformMode`, `telemetrySource`, `collectionMethod`, `isSynthetic`, `isSeeded`, `isReplay`, `collectorId`, `ingestionTimestamp`).
+- **Visual Source Badges**: Color-coded badges (`LIVE SYSLOG`, `LIVE WEF`, `LIVE NETFLOW`, `UPLOADED PCAP`, `NMAP IMPORT`, `DEMO SYNTHETIC`, `DEMO SEEDED`) with hover tooltips for full auditability.
+
+#### Truthful Implementation Status Matrix
+
+| Capability | Status | Telemetry Provenance | Ingestion Path |
+|---|---|---|---|
+| Live Packet Capture (Npcap/libpcap) | **Implemented** | `NETFLOW_COLLECTOR` / `LIVE_CAPTURE` | BPF Frame Engine / Raw Socket |
+| Zeek JSON Log Ingestion | **Implemented** | `ZEEK_LOG` | JSON Ingest (`conn`, `dns`, `http`, `ssl`) |
+| Suricata EVE IDS Ingestion | **Implemented** | `SURICATA_EVE` | EVE JSON Stream (`alert`, `flow`, `dns`) |
+| Live Syslog Server (RFC 3164/5424) | **Implemented** | `SYSLOG_COLLECTOR` | UDP 5514 / TCP 5515 Receiver |
+| Windows Event Forwarding (WEF XML) | **Implemented** | `WEF_COLLECTOR` | HTTP 5516 WinRM XML Receiver |
+| NetFlow v5 / v9 / IPFIX | **Implemented** | `NETFLOW_COLLECTOR` | UDP 2055 Binary Frame Decoder |
+| Binary PCAP Packet Parser | **Implemented** | `PCAP_UPLOAD` | File Upload (`.pcap`, `.pcapng`) |
+| Nmap Scan Import | **Implemented** | `NMAP_IMPORT` | File Import (XML / Standard) |
+| Sigma Threat Detection Engine | **Implemented** | Detection Engine | Automatic Rule Pipeline |
+| Synthetic Demo Generator | **DEMO Mode Only** | `SYNTHETIC_DEMO` | Controlled Simulation Service |
 
 ---
 

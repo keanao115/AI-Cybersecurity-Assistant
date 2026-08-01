@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-const SOC_SYSTEM_PROMPT = `You are the AI Assistant for the Intelligent Enterprise Security Operations Platform, a Senior Security Operations Center (SOC) Analyst and Threat Intelligence expert with 15 years of experience.
+const SOC_SYSTEM_PROMPT = `You are the AI Assistant for the Security Engineering Portfolio Project, a Senior Security Operations Center (SOC) Analyst and Threat Intelligence expert with 15 years of experience.
 
 Your expertise covers:
 - MITRE ATT&CK framework (all tactics and techniques)

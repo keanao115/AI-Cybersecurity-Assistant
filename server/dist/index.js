@@ -29,6 +29,15 @@ import { WefCollectorService } from './collectors/wefCollectorService.js';
 import { NetflowCollectorService } from './collectors/netflowCollectorService.js';
 import { createCollectorRouter } from './routes/collectorRoutes.js';
 import { generatePrometheusMetrics } from './metrics/prometheusExporter.js';
+import { loadPlatformConfig } from './config/platformConfig.js';
+import { platformRouter } from './routes/platformRoutes.js';
+import { SyntheticFlowGenerator } from './demo/syntheticFlowGenerator.js';
+import { seedDemoData } from './demo/seedDataService.js';
+import { captureRouter } from './routes/captureRoutes.js';
+import { zeekRouter } from './routes/zeekRoutes.js';
+import { suricataRouter } from './routes/suricataRoutes.js';
+import { pipelineRouter } from './routes/pipelineRoutes.js';
+import { investigationRouter } from './routes/investigationRoutes.js';
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -117,6 +126,13 @@ app.get('/health', async (req, res) => {
         systemHealth,
     });
 });
+// ─── REST Routes — Platform Mode & Enterprise Telemetry ───────────────────────
+app.use('/api/platform', platformRouter);
+app.use('/api/capture', captureRouter);
+app.use('/api/zeek', zeekRouter);
+app.use('/api/suricata', suricataRouter);
+app.use('/api/pipeline', pipelineRouter);
+app.use('/api/investigation', investigationRouter);
 // ─── REST Routes — Core SOC ──────────────────────────────────────────────────
 app.use('/api/auth', authRouter);
 app.use('/api/assets', authenticateJwt, assetRouter);
@@ -151,18 +167,26 @@ app.use((err, req, res, next) => {
 const httpServer = http.createServer(app);
 initWebSocketServer(httpServer);
 httpServer.listen(PORT, async () => {
+    const platformConfig = loadPlatformConfig();
     console.log(`=======================================================`);
-    console.log(`[Intelligent Enterprise Security Operations Platform v3.0] Running on http://localhost:${PORT}`);
+    console.log(`[Security Engineering Portfolio Project v3.0] Running on http://localhost:${PORT}`);
+    console.log(`[Platform Mode] Operating Mode: ${platformConfig.platformMode} | Synthetic Data: ${platformConfig.enableSyntheticData ? 'ENABLED' : 'DISABLED'} | Seed Data: ${platformConfig.enableSeedData ? 'ENABLED' : 'DISABLED'}`);
     console.log(`[WebSocket] Live Telemetry Stream: ws://localhost:${PORT}/ws/telemetry`);
     console.log(`[Prometheus] OpenMetrics Endpoint: http://localhost:${PORT}/metrics`);
     console.log(`=======================================================`);
     await initDbConnection();
     // Start Enterprise Telemetry Collectors (Syslog RFC 3164/5424, WEF XML, NetFlow v5/v9/IPFIX)
-    // Start Enterprise Collectors (Syslog, WEF, NetFlow)
     for (const c of collectors) {
         c.start().catch((err) => {
             console.warn(`[Collector Boot Warning] ${c.name} start delayed:`, err.message);
         });
+    }
+    // Conditionally seed assets or run synthetic generators ONLY if explicitly enabled in DEMO mode
+    if (platformConfig.enableSeedData) {
+        seedDemoData();
+    }
+    if (platformConfig.enableSyntheticData) {
+        SyntheticFlowGenerator.getInstance().start();
     }
     // Load threat intel feeds asynchronously (non-blocking)
     loadThreatIntelFeeds().catch(err => {

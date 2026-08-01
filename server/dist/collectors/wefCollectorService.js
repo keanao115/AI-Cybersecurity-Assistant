@@ -2,6 +2,7 @@ import http from 'http';
 import { BaseCollector } from './baseCollector.js';
 import { parseWindowsEventXml } from '../parsers/wef/wefXmlParser.js';
 import { crypto } from '../utils/cryptoShim.js';
+import { createLiveCollectorProvenance } from '../provenance/provenanceFactory.js';
 export class WefCollectorService extends BaseCollector {
     httpServer = null;
     boundPort = 0;
@@ -77,6 +78,7 @@ export class WefCollectorService extends BaseCollector {
                 eventId: parsedWef.eventId,
                 tags: ['windows', 'wef', parsedWef.channel.toLowerCase()],
             },
+            provenance: createLiveCollectorProvenance('wef', `wef-http-${destPort}`, parsedWef.timestamp),
         };
         return unified;
     }

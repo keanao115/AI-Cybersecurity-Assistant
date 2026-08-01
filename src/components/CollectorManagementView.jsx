@@ -24,6 +24,8 @@ import {
   fetchCollectorEvents,
   controlCollectorState,
 } from '../services/apiClient';
+import TelemetrySourceBadge from './TelemetrySourceBadge';
+import LiveEmptyState from './LiveEmptyState';
 
 export default function CollectorManagementView() {
   const [collectors, setCollectors] = useState([]);
@@ -360,9 +362,7 @@ export default function CollectorManagementView() {
                       {new Date(evt.timestamp).toLocaleTimeString()}
                     </td>
                     <td className="p-3">
-                      <span className="uppercase text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-cyan-400 border border-cyan-500/30">
-                        {evt.collector}
-                      </span>
+                      <TelemetrySourceBadge provenance={evt.provenance} sourceText={evt.collector} />
                     </td>
                     <td className="p-3">
                       <span

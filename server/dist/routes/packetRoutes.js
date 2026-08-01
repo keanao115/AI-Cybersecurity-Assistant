@@ -2,6 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import { parsePcapMetadata, getPcapHistory } from '../services/packetAnalysisService.js';
 import { parsePcapBuffer } from '../services/pcapBinaryParser.js';
+import { createPcapUploadProvenance } from '../provenance/provenanceFactory.js';
 export const packetRouter = Router();
 // Multer: store uploaded file in memory as Buffer (no disk writes needed)
 const upload = multer({
@@ -34,9 +35,11 @@ packetRouter.post('/upload', upload.single('pcapFile'), (req, res) => {
                 hint: 'File must be a valid PCAP capture (magic bytes: 0xa1b2c3d4 or 0xd4c3b2a1)',
             });
         }
+        const sessionId = `PCAP-${Date.now()}`;
+        const provenance = createPcapUploadProvenance(fileName, sessionId);
         // Convert to the legacy ParsedPcapSummary format for frontend compatibility
         const summary = {
-            id: `PCAP-${Date.now()}`,
+            id: sessionId,
             pcapFileName: fileName,
             totalPackets: parseResult.totalPackets,
             validPackets: parseResult.validPackets,
@@ -44,6 +47,7 @@ packetRouter.post('/upload', upload.single('pcapFile'), (req, res) => {
             uploadedAt: new Date().toISOString(),
             fileSizeBytes: buffer.length,
             linkType: parseResult.linkType,
+            provenance,
             protocolDistribution: Object.entries(parseResult.protocolCounts)
                 .map(([protocol, count]) => ({
                 protocol,

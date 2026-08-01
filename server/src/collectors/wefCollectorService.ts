@@ -4,6 +4,7 @@ import { CollectorConfig, UnifiedSecurityEvent } from './collectorTypes.js';
 import { IMessageQueue } from '../queue/messageQueue.js';
 import { parseWindowsEventXml } from '../parsers/wef/wefXmlParser.js';
 import { crypto } from '../utils/cryptoShim.js';
+import { createLiveCollectorProvenance } from '../provenance/provenanceFactory.js';
 
 export class WefCollectorService extends BaseCollector {
   private httpServer: http.Server | null = null;
@@ -104,6 +105,7 @@ export class WefCollectorService extends BaseCollector {
         eventId: parsedWef.eventId,
         tags: ['windows', 'wef', parsedWef.channel.toLowerCase()],
       },
+      provenance: createLiveCollectorProvenance('wef', `wef-http-${destPort}`, parsedWef.timestamp),
     };
 
     return unified;

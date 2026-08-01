@@ -1,5 +1,6 @@
 import React from 'react';
 import { Shield, Key, Sparkles, Activity, User, Bell } from 'lucide-react';
+import PlatformModeBadge from './PlatformModeBadge';
 
 export default function Header({ apiKey, setApiKey, setShowApiModal }) {
   return (
@@ -13,7 +14,7 @@ export default function Header({ apiKey, setApiKey, setShowApiModal }) {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="font-extrabold text-base tracking-wider bg-gradient-to-r from-white via-slate-200 to-cyan-400 bg-clip-text text-transparent">
-              Intelligent Enterprise Security Operations Platform
+              Security Engineering Portfolio Project
             </h1>
             <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
               ENTERPRISE v3.0
@@ -24,6 +25,8 @@ export default function Header({ apiKey, setApiKey, setShowApiModal }) {
       </div>
 
       <div className="flex items-center gap-4">
+        <PlatformModeBadge />
+
         {/* Status indicator */}
         <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>

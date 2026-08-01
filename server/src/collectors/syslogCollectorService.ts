@@ -6,6 +6,7 @@ import { IMessageQueue } from '../queue/messageQueue.js';
 import { parseSyslogHeader } from '../parsers/syslog/syslogRfcParser.js';
 import { SyslogVendorRegistry } from '../parsers/syslog/syslogVendorRegistry.js';
 import { crypto } from '../utils/cryptoShim.js';
+import { createLiveCollectorProvenance } from '../provenance/provenanceFactory.js';
 
 export class SyslogCollectorService extends BaseCollector {
   private udpSocket: dgram.Socket | null = null;
@@ -106,6 +107,7 @@ export class SyslogCollectorService extends BaseCollector {
         facility: header.facility,
         tags: ['syslog', ...vendorResult.tags],
       },
+      provenance: createLiveCollectorProvenance('syslog', `syslog-${protocol.toLowerCase()}-${destPort}`, header.timestamp),
     };
 
     return unified;

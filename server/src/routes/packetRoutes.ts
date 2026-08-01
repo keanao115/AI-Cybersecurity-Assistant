@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express';
 import multer from 'multer';
 import { parsePcapMetadata, getPcapHistory } from '../services/packetAnalysisService.js';
 import { parsePcapBuffer } from '../services/pcapBinaryParser.js';
+import { createPcapUploadProvenance } from '../provenance/provenanceFactory.js';
 
 export const packetRouter = Router();
 
@@ -40,9 +41,12 @@ packetRouter.post('/upload', upload.single('pcapFile'), (req: Request, res: Resp
       });
     }
 
+    const sessionId = `PCAP-${Date.now()}`;
+    const provenance = createPcapUploadProvenance(fileName, sessionId);
+
     // Convert to the legacy ParsedPcapSummary format for frontend compatibility
     const summary = {
-      id: `PCAP-${Date.now()}`,
+      id: sessionId,
       pcapFileName: fileName,
       totalPackets: parseResult.totalPackets,
       validPackets: parseResult.validPackets,
@@ -50,6 +54,7 @@ packetRouter.post('/upload', upload.single('pcapFile'), (req: Request, res: Resp
       uploadedAt: new Date().toISOString(),
       fileSizeBytes: buffer.length,
       linkType: parseResult.linkType,
+      provenance,
       protocolDistribution: Object.entries(parseResult.protocolCounts)
         .map(([protocol, count]) => ({
           protocol,

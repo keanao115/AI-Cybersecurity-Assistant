@@ -20,6 +20,12 @@ import PacketInspectorView from './components/PacketInspectorView';
 import AssetDiscoveryView from './components/AssetDiscoveryView';
 import SiemEventConsole from './components/SiemEventConsole';
 import CollectorManagementView from './components/CollectorManagementView';
+import LivePacketCaptureView from './components/LivePacketCaptureView';
+import ZeekSuricataView from './components/ZeekSuricataView';
+import PipelinePerformanceView from './components/PipelinePerformanceView';
+import InvestigationTimelineView from './components/InvestigationTimelineView';
+import { PlatformModeProvider } from './contexts/PlatformModeContext';
+import DemoWarningBanner from './components/DemoWarningBanner';
 
 import { SAMPLE_WINDOWS_LOGS, SAMPLE_LINUX_LOGS, SAMPLE_FIREWALL_LOGS, SAMPLE_NMAP_XML } from './data/sampleData';
 import { parseWindowsEventLog, parseLinuxLog, parseFirewallLog, parseNmapScan } from './utils/logParsers';
@@ -51,12 +57,14 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070a12] text-slate-100 font-sans flex flex-col selection:bg-cyan-500 selection:text-white">
-      {/* Header */}
-      <Header apiKey={apiKey} setApiKey={setApiKey} setShowApiModal={() => setShowApiModal(true)} />
+    <PlatformModeProvider>
+      <div className="min-h-screen bg-[#070a12] text-slate-100 font-sans flex flex-col selection:bg-cyan-500 selection:text-white">
+        {/* Header */}
+        <Header apiKey={apiKey} setApiKey={setApiKey} setShowApiModal={() => setShowApiModal(true)} />
+        <DemoWarningBanner />
 
-      <div className="flex-1 flex overflow-hidden">
-        {/* Sidebar */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Sidebar */}
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
         {/* Main Content Area */}
@@ -76,8 +84,12 @@ export default function App() {
           {activeTab === 'settings' && (
             <SettingsView apiKey={apiKey} setApiKey={setApiKey} aiModel={aiModel} setAiModel={setAiModel} />
           )}
-          {/* SOC Platform Expansion — Phase 2 */}
+          {/* SOC Platform Expansion — Phase 2 & 3 */}
           {activeTab === 'collectors' && <CollectorManagementView />}
+          {activeTab === 'packet-capture' && <LivePacketCaptureView />}
+          {activeTab === 'zeek-suricata' && <ZeekSuricataView />}
+          {activeTab === 'pipeline-performance' && <PipelinePerformanceView />}
+          {activeTab === 'investigation-timeline' && <InvestigationTimelineView />}
           {activeTab === 'live-network' && <LiveNetworkDashboard />}
           {activeTab === 'packet-inspector' && <PacketInspectorView />}
           {activeTab === 'asset-discovery' && <AssetDiscoveryView />}
@@ -90,5 +102,6 @@ export default function App() {
         <ApiKeyModal apiKey={apiKey} setApiKey={setApiKey} onClose={() => setShowApiModal(false)} />
       )}
     </div>
+    </PlatformModeProvider>
   );
 }
